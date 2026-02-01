@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cricket Overlay</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOGO -->
+<div id="channelLogo">
+  <img src="ankit_gond_vlog.png">
+  <div class="logoShimmer"></div>
+  <div class="liveBadge">
+    <span class="liveDot"></span>
+    LIVE
+  </div>
+
+</div>
+
+<!-- MATCH INFO -->
+<div id="matchInfo">–</div>
+
+<!-- SCORE STRIP -->
+<div id="scoreStrip">
+
+  <!-- LEFT -->
+  <div class="teamStatus left">
+    <div class="teamName" id="battingTeam">–</div>
+    <div class="teamRole">Batting</div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="scoreCenter">
+    <div class="match" id="match">–</div>
+
+    <div class="scoreLine">
+      <span id="total">0–0</span>
+      <span class="overs" id="overs">0.0 overs</span>
+    </div>
+
+    <div class="target" id="target"></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="teamStatus right">
+    <div class="teamName" id="fieldingTeam">–</div>
+    <div class="teamRole">Fielding</div>
+  </div>
+
+  <div class="stripShimmer"></div>
+</div>
+
+<div id="eventOverlay"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

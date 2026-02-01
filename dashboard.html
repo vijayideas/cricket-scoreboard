@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cricket Match Control</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  background:linear-gradient(180deg,#041421,#01080f);
+  color:#fff;
+  font-family:system-ui,-apple-system;
+}
+.container{max-width:1100px;margin:auto;padding:20px}
+h1{text-align:center;margin-bottom:16px}
+
+.card{
+  background:linear-gradient(180deg,#0a2d45,#061f30);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+}
+.card h2{
+  margin:0 0 10px;
+  font-size:15px;
+  color:#9ad1ff
+}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+
+input,select{
+  flex:1;
+  min-width:200px;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  font-size:14px
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:12px
+}
+
+button{
+  padding:14px;
+  font-size:16px;
+  font-weight:700;
+  border:none;
+  border-radius:14px;
+  cursor:pointer
+}
+
+.b1{background:#2196f3}
+.b4{background:#f1c40f;color:#000}
+.b6{background:#2ecc71}
+.bw{background:#e74c3c}
+.bro{background:#c0392b}
+.bwd{background:#9b59b6}
+.bnb{background:#ff9800;color:#000}
+.bu{background:#7f8c8d}
+.end{background:#8e44ad}
+.push{background:#2ecc71;font-size:18px}
+
+button:disabled{opacity:.4;cursor:not-allowed}
+
+.score{
+  text-align:center;
+  font-size:22px;
+  margin-top:10px
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>🏏 MATCH CONTROL DASHBOARD</h1>
+
+<!-- TEAMS -->
+<div class="card">
+<h2>Teams</h2>
+<div class="row">
+<input id="teamA" placeholder="Team A">
+<input id="teamB" placeholder="Team B">
+</div>
+</div>
+
+<!-- TOSS -->
+<div class="card">
+<h2>Toss</h2>
+<div class="row">
+<select id="tossWinner"></select>
+<select id="tossDecision">
+  <option value="bat">Bat</option>
+  <option value="bowl">Bowl</option>
+</select>
+<button onclick="startMatch()">Start Match</button>
+</div>
+</div>
+
+<!-- SCORE -->
+<div class="card">
+<h2>Score Control</h2>
+
+<div class="grid">
+<button class="b1" onclick="addRuns(1)">+1</button>
+<button class="b4" onclick="addRuns(4)">4</button>
+<button class="b6" onclick="addRuns(6)">6</button>
+<button class="bwd" onclick="wide()">Wide</button>
+<button class="bnb" onclick="noBall()">No Ball</button>
+<button class="bw" onclick="wicket()">W</button>
+</div>
+
+<div class="grid" style="margin-top:10px">
+<button class="bro" onclick="runOut()">Run Out</button>
+<button class="bu" onclick="undo()">Undo</button>
+<button class="end" onclick="endInnings()">End Innings</button>
+</div>
+
+<div class="score" id="scoreText">Loading…</div>
+</div>
+
+<button id="pushBtn" class="push" onclick="pushFull()" disabled>
+🚀 PUSH LIVE
+</button>
+</div>
+
+<script>
+/* ========== CONFIG ========== */
+const SHEET_ID = "1-1sD_emsSkFG59Nafu5rL10EsFsac5ch7FUhwAqqvz0";
+const SHEET_NAME = "Score";
+const API_URL = "https://script.google.com/macros/s/AKfycbxMESs7vN-Gh69b5pyHIxDhZwy0phC-AFDudWZnKhzxmhyzDw0KndfC5UadJQeIIm5ULA/exec";
+
+/* ========== STATE ========== */
+let S={
+  innings:1,
+  batting:"",
+  fielding:"",
+  runs:0,
+  wickets:0,
+  balls:0,
+  history:[]
+};
+
+const overs=()=>Math.floor(S.balls/6)+"."+(S.balls%6);
+
+/* ========== TOSS ========== */
+function buildToss(){
+  const a=teamA.value.trim(), b=teamB.value.trim();
+  tossWinner.innerHTML="";
+  if(!a||!b){
+    tossWinner.innerHTML="<option value=''>Enter both teams</option>";
+    return;
+  }
+  tossWinner.innerHTML=
+    `<option value="${a}">${a}</option>
+     <option value="${b}">${b}</option>`;
+}
+teamA.oninput=teamB.oninput=buildToss;
+
+/* ========== LOAD FROM SHEET ========== */
+google={visualization:{Query:{}}};
+google.visualization.Query.setResponse=function(res){
+  const m={};
+  res.table.rows.forEach(r=>{
+    if(r.c[0]) m[r.c[0].v]=r.c[1]?.v||"";
+  });
+
+  teamA.value=m.teamA||"";
+  teamB.value=m.teamB||"";
+
+  S.innings=Number(m.innings||1);
+  S.runs=Number(m.runs||0);
+  S.wickets=Number(m.wickets||0);
+  S.balls=Number(m.balls||0);
+  S.batting=m.battingTeam||"";
+  S.fielding=m.fieldingTeam||"";
+  S.history=[];
+
+  buildToss();
+  render();
+  updatePushButton();
+};
+
+function loadFromSheet(){
+  document.getElementById("gviz")?.remove();
+  const s=document.createElement("script");
+  s.id="gviz";
+  s.src=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}&tqx=out:json`;
+  document.body.appendChild(s);
+}
+
+/* ========== SNAPSHOT ========== */
+function snapshot(){
+  S.history.push(JSON.parse(JSON.stringify(S)));
+}
+
+/* ========== START MATCH ========== */
+function startMatch(){
+  if(!teamA.value||!teamB.value) return alert("Enter teams");
+  if(!tossWinner.value) return alert("Select toss winner");
+
+  snapshot();
+
+  const A=teamA.value.trim();
+  const B=teamB.value.trim();
+  const win=tossWinner.value;
+  const dec=tossDecision.value;
+
+  S.innings=1;
+  S.runs=0;S.wickets=0;S.balls=0;
+
+  if(dec==="bat"){
+    S.batting=win;
+    S.fielding=win===A?B:A;
+  }else{
+    S.fielding=win;
+    S.batting=win===A?B:A;
+  }
+
+  post({
+    teamA:A,
+    teamB:B,
+    match:`${A} vs ${B}`,
+    innings:1,
+    battingTeam:S.batting,
+    fieldingTeam:S.fielding,
+    runs:0,
+    wickets:0,
+    balls:0,
+    target:""
+  });
+
+  render();
+  updatePushButton();
+}
+
+/* ========== SCORING ========== */
+function addRuns(n){snapshot();S.runs+=n;S.balls++;pushScore();}
+function wicket(){snapshot();S.wickets++;S.balls++;pushScore();}
+function wide(){snapshot();S.runs++;pushScore();}
+function noBall(){snapshot();S.runs++;pushScore();}
+
+function runOut(){
+  const r=prompt("Runs on run out? (0–3)","0");
+  if(r===null) return;
+  const runs=Number(r);
+  if(isNaN(runs)||runs<0||runs>3){
+    alert("Enter 0–3 only");return;
+  }
+  snapshot();
+  S.runs+=runs;
+  S.wickets+=1;
+  S.balls+=1;
+  pushScore();
+}
+
+function undo(){
+  if(!S.history.length) return;
+  S=S.history.pop();
+  pushFull();
+}
+
+/* ========== END INNINGS ========== */
+function endInnings(){
+  if(S.innings>=2) return alert("2nd innings already running");
+
+  snapshot();
+  const target=S.runs+1;
+
+  S.innings=2;
+  [S.batting,S.fielding]=[S.fielding,S.batting];
+  S.runs=0;S.wickets=0;S.balls=0;
+
+  post({
+    innings:2,
+    battingTeam:S.batting,
+    fieldingTeam:S.fielding,
+    runs:0,wickets:0,balls:0,
+    target
+  });
+
+  render();
+}
+
+/* ========== RENDER ========== */
+function render(){
+  scoreText.innerText=
+    `Innings ${S.innings} • ${S.batting} ${S.runs}-${S.wickets} (${overs()})`;
+}
+
+/* ========== PUSH ========== */
+function post(obj){
+  const fd=new FormData();
+  Object.entries(obj).forEach(([k,v])=>{
+    if(v!==""&&v!==undefined&&v!==null) fd.append(k,v);
+  });
+  fetch(API_URL,{method:"POST",body:fd,mode:"no-cors"});
+}
+
+function pushScore(){
+  post({
+    innings:S.innings,
+    battingTeam:S.batting,
+    fieldingTeam:S.fielding,
+    runs:S.runs,
+    wickets:S.wickets,
+    balls:S.balls
+  });
+  render();
+}
+
+function pushFull(){
+  post({
+    teamA:teamA.value,
+    teamB:teamB.value,
+    innings:S.innings,
+    battingTeam:S.batting,
+    fieldingTeam:S.fielding,
+    runs:S.runs,
+    wickets:S.wickets,
+    balls:S.balls
+  });
+  render();
+}
+
+/* ========== PUSH BUTTON STATE ========== */
+function updatePushButton(){
+  pushBtn.disabled=!(
+    teamA.value&&teamB.value&&S.batting&&S.fielding
+  );
+}
+
+/* ========== INIT ========== */
+loadFromSheet();
+</script>
+</body>
+</html>

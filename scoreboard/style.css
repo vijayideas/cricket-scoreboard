@@ -1,0 +1,389 @@
+/* =========================
+   GLOBAL
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+  background: transparent;
+  overflow: hidden;
+}
+
+/* =========================
+   LOGO
+========================= */
+#channelLogo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 220px;
+}
+
+#channelLogo img {
+  width: 100%;
+  display: block;
+}
+
+#channelLogo {
+  overflow: hidden; /* shimmer ke liye zaroori */
+}
+
+#channelLogo::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 120%;
+  height: 100%;
+
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255,255,255,0.22),
+    transparent 70%
+  );
+
+  animation: logoShimmer 10s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes logoShimmer {
+  0%   { left: -120%; }
+  100% { left: 120%; }
+}
+
+/* ===== LIVE Badge ===== */
+/* ===== LIVE Badge (FIXED) ===== */
+.liveBadge {
+  position: absolute;
+  top: 8px;          /* logo ke andar */
+  right: 80px;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+
+  color: #ff3b3b;
+  background: rgba(0,0,0,0.55);
+  padding: 3px 8px;
+  border-radius: 10px;
+
+  backdrop-filter: blur(4px);
+  z-index: 2;
+}
+
+
+/* 🔴 Blinking Dot */
+.liveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3b3b;
+  box-shadow: 0 0 6px rgba(255,59,59,0.8);
+  animation: liveBlink 1.6s ease-in-out infinite;
+}
+
+/* Smooth broadcast blink */
+@keyframes liveBlink {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+
+/* =========================
+   MATCH INFO (TOP)
+========================= */
+#matchInfo {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.7px;
+
+  color: rgba(255, 255, 255, 0.92);
+  background: linear-gradient(135deg, #2c0052, #6a1bb1);
+  backdrop-filter: blur(6px);
+
+  padding: 6px 16px;
+  border-radius: 14px;
+  white-space: nowrap;
+
+  z-index: 30;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+
+  overflow: hidden; /* for shimmer */
+}
+
+#matchInfo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255,255,255,0.15) 50%,
+    transparent 70%
+  );
+  animation: infoShimmer 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes infoShimmer {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+
+
+/* =========================
+   SCORE STRIP
+========================= */
+#scoreStrip {
+  position: fixed;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 1600px;
+  height: 50px;
+  background: linear-gradient(135deg, #2c0052, #6a1bb1);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 26px;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+}
+
+/* =========================
+   SHIMMER EFFECT
+========================= */
+.stripShimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* =========================
+   TEAM STATUS
+========================= */
+.teamStatus {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 2;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+
+.teamStatus.left {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.teamStatus.right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.teamName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.teamRole {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* =========================
+   SCORE CENTER
+========================= */
+.scoreCenter {
+  text-align: center;
+  color: #ffffff;
+  z-index: 2;
+}
+
+.scoreCenter .match {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 2px;
+}
+
+.scoreLine {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.scoreLine .overs {
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 6px;
+  opacity: 0.85;
+}
+
+@keyframes scorePop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* =========================
+   TARGET / CHASE INFO
+========================= */
+.target {
+  margin-top: 4px;
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  display: inline-block;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  #scoreStrip {
+    height: 80px;
+    padding: 0 18px;
+  }
+
+  .teamName {
+    font-size: 18px;
+  }
+
+  .scoreLine {
+    font-size: 18px;
+  }
+}
+
+/* =========================
+   EVENT OVERLAY (4 / 6 / WICKET)
+========================= */
+/* =========================
+   EVENT OVERLAY (BIG CENTER)
+========================= */
+#eventOverlay {
+  position: fixed;
+  inset: 0;                     /* full screen */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 160px;             /* BIG number */
+  font-weight: 900;
+  letter-spacing: 6px;
+
+  color: #fff;
+  text-shadow:
+    0 8px 30px rgba(0,0,0,0.55),
+    0 0 40px rgba(255,255,255,0.25);
+
+  opacity: 0;
+  pointer-events: none;
+  z-index: 80;
+}
+
+/* FOUR */
+#eventOverlay.four {
+  color: #ffd166;
+}
+
+/* SIX */
+#eventOverlay.six {
+  color: #ffb703;
+}
+
+/* WICKET */
+#eventOverlay.wicket {
+  font-size: 120px;
+  color: #ff4d4d;
+}
+
+/* Pop animation */
+@keyframes bigPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+#eventOverlay.show {
+  animation: bigPop 2.4s ease-out forwards;
+}
+
+/* =========================
+   FULL-SCREEN CONFETTI
+========================= */
+.confetti {
+  position: fixed;
+  top: -10px;
+  width: 10px;
+  height: 14px;
+  background: gold;
+  opacity: 0.95;
+  z-index: 70;
+  pointer-events: none;
+  animation: confettiDrop 2.6s ease-out forwards;
+}
+
+.confetti.white { background: #fff; }
+.confetti.orange { background: #ffb703; }
+
+@keyframes confettiDrop {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
