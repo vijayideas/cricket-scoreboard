@@ -157,7 +157,7 @@ body {
   transform: translateX(-50%);
   width: calc(100% - 40px);
   max-width: 1600px;
-  height: 50px;
+  height: 80px;
   background: linear-gradient(135deg, #2c0052, #6a1bb1);
   border-radius: 14px;
   display: flex;
