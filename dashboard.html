@@ -39,7 +39,7 @@ input,select{
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(6,1fr);
+  grid-template-columns:repeat(auto-fit, minmax(120px,1fr));
   gap:12px
 }
 
@@ -53,6 +53,7 @@ button{
 }
 
 .b1{background:#2196f3}
+.b0{background:#34495e}
 .b4{background:#f1c40f;color:#000}
 .b6{background:#2ecc71}
 .bw{background:#e74c3c}
@@ -61,6 +62,7 @@ button{
 .bnb{background:#ff9800;color:#000}
 .bu{background:#7f8c8d}
 .end{background:#8e44ad}
+.bman{background:#16a085}
 .push{background:#2ecc71;font-size:18px}
 
 button:disabled{opacity:.4;cursor:not-allowed}
@@ -68,7 +70,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .score{
   text-align:center;
   font-size:22px;
-  margin-top:10px
+  margin-top:10px;
+  white-space:pre-line;
 }
 </style>
 </head>
@@ -105,6 +108,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 <h2>Score Control</h2>
 
 <div class="grid">
+<button class="b0" onclick="dotBall()">0</button>
 <button class="b1" onclick="addRuns(1)">+1</button>
 <button class="b4" onclick="addRuns(4)">4</button>
 <button class="b6" onclick="addRuns(6)">6</button>
@@ -114,6 +118,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 </div>
 
 <div class="grid" style="margin-top:10px">
+<button class="bman" onclick="manualRuns()">Manual</button>
 <button class="bro" onclick="runOut()">Run Out</button>
 <button class="bu" onclick="undo()">Undo</button>
 <button class="end" onclick="endInnings()">End Innings</button>
@@ -141,6 +146,7 @@ let S={
   runs:0,
   wickets:0,
   balls:0,
+  overEvents:[],
   history:[]
 };
 
@@ -177,6 +183,8 @@ google.visualization.Query.setResponse=function(res){
   S.balls=Number(m.balls||0);
   S.batting=m.battingTeam||"";
   S.fielding=m.fieldingTeam||"";
+  const overStr=(m.thisOver||"").toString().trim();
+  S.overEvents=overStr?overStr.split(" "):[];
   S.history=[];
 
   buildToss();
@@ -211,6 +219,7 @@ function startMatch(){
 
   S.innings=1;
   S.runs=0;S.wickets=0;S.balls=0;
+  S.overEvents=[];
 
   if(dec==="bat"){
     S.batting=win;
@@ -230,6 +239,7 @@ function startMatch(){
     runs:0,
     wickets:0,
     balls:0,
+    thisOver:"",
     target:""
   });
 
@@ -237,11 +247,64 @@ function startMatch(){
   updatePushButton();
 }
 
+/* ========== OVER TRACKING ========== */
+function startNewOverIfNeeded(){
+  if(S.balls>0 && S.balls%6===0) S.overEvents=[];
+}
+
+function recordEvent(label,isLegalBall){
+  startNewOverIfNeeded();
+  S.overEvents.push(label);
+  if(isLegalBall) S.balls++;
+}
+
 /* ========== SCORING ========== */
-function addRuns(n){snapshot();S.runs+=n;S.balls++;pushScore();}
-function wicket(){snapshot();S.wickets++;S.balls++;pushScore();}
-function wide(){snapshot();S.runs++;pushScore();}
-function noBall(){snapshot();S.runs++;pushScore();}
+function addRuns(n){
+  snapshot();
+  S.runs+=n;
+  recordEvent(String(n),true);
+  pushScore();
+}
+
+function manualRuns(){
+  const r=prompt("Runs (0–6)","2");
+  if(r===null) return;
+  const runs=Number(r);
+  if(!Number.isInteger(runs)||runs<0||runs>6){
+    alert("Enter 0–6 only");return;
+  }
+  snapshot();
+  S.runs+=runs;
+  recordEvent(String(runs),true);
+  pushScore();
+}
+
+function dotBall(){
+  snapshot();
+  recordEvent("0",true);
+  pushScore();
+}
+
+function wicket(){
+  snapshot();
+  S.wickets++;
+  recordEvent("W",true);
+  pushScore();
+}
+
+function wide(){
+  snapshot();
+  S.runs++;
+  recordEvent("Wd",false);
+  pushScore();
+}
+
+function noBall(){
+  snapshot();
+  S.runs++;
+  recordEvent("Nb",false);
+  pushScore();
+}
 
 function runOut(){
   const r=prompt("Runs on run out? (0–3)","0");
@@ -253,7 +316,7 @@ function runOut(){
   snapshot();
   S.runs+=runs;
   S.wickets+=1;
-  S.balls+=1;
+  recordEvent(runs>0?`W+${runs}`:"W",true);
   pushScore();
 }
 
@@ -273,12 +336,14 @@ function endInnings(){
   S.innings=2;
   [S.batting,S.fielding]=[S.fielding,S.batting];
   S.runs=0;S.wickets=0;S.balls=0;
+  S.overEvents=[];
 
   post({
     innings:2,
     battingTeam:S.batting,
     fieldingTeam:S.fielding,
     runs:0,wickets:0,balls:0,
+    thisOver:"",
     target
   });
 
@@ -288,7 +353,8 @@ function endInnings(){
 /* ========== RENDER ========== */
 function render(){
   scoreText.innerText=
-    `Innings ${S.innings} • ${S.batting} ${S.runs}-${S.wickets} (${overs()})`;
+    `Innings ${S.innings} • ${S.batting} ${S.runs}-${S.wickets} (${overs()})\n`+
+    `This over: ${S.overEvents.length?S.overEvents.join(" "):"–"}`;
 }
 
 /* ========== PUSH ========== */
@@ -307,7 +373,8 @@ function pushScore(){
     fieldingTeam:S.fielding,
     runs:S.runs,
     wickets:S.wickets,
-    balls:S.balls
+    balls:S.balls,
+    thisOver:S.overEvents.join(" ")
   });
   render();
 }
@@ -321,7 +388,8 @@ function pushFull(){
     fieldingTeam:S.fielding,
     runs:S.runs,
     wickets:S.wickets,
-    balls:S.balls
+    balls:S.balls,
+    thisOver:S.overEvents.join(" ")
   });
   render();
 }

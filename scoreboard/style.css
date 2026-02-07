@@ -1,11 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;600;700;800&display=swap");
+
 /* =========================
    GLOBAL
 ========================= */
+:root {
+  --ink: #f5f7fb;
+  --muted: rgba(245, 247, 251, 0.72);
+  --glass: rgba(10, 20, 30, 0.72);
+  --navy: #0a1c2b;
+  --teal: #0f766e;
+  --gold: #f4d35e;
+  --gold-deep: #e9b949;
+  --accent: #34d399;
+  --danger: #ff5c5c;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: "Sora", system-ui, -apple-system, sans-serif;
 }
 
 body {
@@ -18,35 +33,36 @@ body {
 ========================= */
 #channelLogo {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 220px;
+  top: 12px;
+  right: 12px;
+  width: 210px;
+  padding: 8px;
+  border-radius: 14px;
+  background: rgba(7, 15, 24, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  backdrop-filter: blur(6px);
 }
 
 #channelLogo img {
   width: 100%;
   display: block;
+  border-radius: 10px;
 }
 
-#channelLogo {
-  overflow: hidden; /* shimmer ke liye zaroori */
-}
-
-#channelLogo::after {
-  content: "";
+.logoShimmer {
   position: absolute;
   top: 0;
   left: -120%;
   width: 120%;
   height: 100%;
-
   background: linear-gradient(
     120deg,
     transparent 30%,
-    rgba(255,255,255,0.22),
+    rgba(255, 255, 255, 0.2),
     transparent 70%
   );
-
   animation: logoShimmer 10s ease-in-out infinite;
   pointer-events: none;
 }
@@ -60,8 +76,8 @@ body {
 /* ===== LIVE Badge (FIXED) ===== */
 .liveBadge {
   position: absolute;
-  top: 8px;          /* logo ke andar */
-  right: 80px;
+  top: 8px;
+  right: 18px;
 
   display: flex;
   align-items: center;
@@ -71,8 +87,8 @@ body {
   font-weight: 700;
   letter-spacing: 0.6px;
 
-  color: #ff3b3b;
-  background: rgba(0,0,0,0.55);
+  color: var(--danger);
+  background: rgba(0, 0, 0, 0.55);
   padding: 3px 8px;
   border-radius: 10px;
 
@@ -86,8 +102,8 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #ff3b3b;
-  box-shadow: 0 0 6px rgba(255,59,59,0.8);
+  background: var(--danger);
+  box-shadow: 0 0 8px rgba(255, 92, 92, 0.9);
   animation: liveBlink 1.6s ease-in-out infinite;
 }
 
@@ -104,23 +120,23 @@ body {
 ========================= */
 #matchInfo {
   position: fixed;
-  top: 24px;
-  left: 24px;
+  top: 22px;
+  left: 22px;
 
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.7px;
 
-  color: rgba(255, 255, 255, 0.92);
-  background: linear-gradient(135deg, #2c0052, #6a1bb1);
-  backdrop-filter: blur(6px);
+  color: var(--ink);
+  background: linear-gradient(135deg, rgba(8, 29, 48, 0.92), rgba(12, 78, 73, 0.9));
+  backdrop-filter: blur(8px);
 
-  padding: 6px 16px;
+  padding: 8px 18px;
   border-radius: 14px;
   white-space: nowrap;
 
   z-index: 30;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  box-shadow: var(--shadow);
 
   overflow: hidden; /* for shimmer */
 }
@@ -133,7 +149,7 @@ body {
   background: linear-gradient(
     120deg,
     transparent 30%,
-    rgba(255,255,255,0.15) 50%,
+    rgba(255, 255, 255, 0.15) 50%,
     transparent 70%
   );
   animation: infoShimmer 6s ease-in-out infinite;
@@ -152,20 +168,49 @@ body {
 ========================= */
 #scoreStrip {
   position: fixed;
-  bottom: 5px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
-  max-width: 1600px;
-  height: 80px;
-  background: linear-gradient(135deg, #2c0052, #6a1bb1);
-  border-radius: 14px;
+  max-width: 1700px;
+  height: 100px;
+  background: linear-gradient(135deg, rgba(9, 22, 35, 0.95), rgba(8, 55, 60, 0.95));
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 26px;
+  padding: 0 28px;
   overflow: hidden;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  animation: scoreSlideIn 0.8s ease-out both;
+}
+
+#scoreStrip::before {
+  content: "";
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 60%;
+  background: linear-gradient(120deg, rgba(244, 211, 94, 0.2), transparent 70%);
+  transform: rotate(-3deg);
+  pointer-events: none;
+}
+
+#scoreStrip::after {
+  content: "";
+  position: absolute;
+  inset: auto 10% 0 10%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+@keyframes scoreSlideIn {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
 }
 
 /* =========================
@@ -180,10 +225,10 @@ body {
   background: linear-gradient(
     120deg,
     transparent,
-    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.12),
     transparent
   );
-  animation: shimmer 3s infinite;
+  animation: shimmer 4.5s infinite;
 }
 
 @keyframes shimmer {
@@ -218,14 +263,22 @@ body {
 }
 
 .teamName {
-  font-size: 18px;
-  font-weight: 600;
-  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  text-transform: uppercase;
 }
 
 .teamRole {
+  margin-top: 4px;
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--muted);
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.8px;
+  width: fit-content;
 }
 
 /* =========================
@@ -233,44 +286,65 @@ body {
 ========================= */
 .scoreCenter {
   text-align: center;
-  color: #ffffff;
+  color: var(--ink);
   z-index: 2;
 }
 
 .scoreCenter .match {
   font-size: 12px;
-  opacity: 0.9;
-  margin-bottom: 2px;
+  opacity: 0.8;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .scoreLine {
-  font-size: 18px;
+  font-size: 26px;
   font-weight: 800;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
 }
 
 .scoreLine .overs {
-  font-size: 14px;
-  font-weight: 500;
-  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 600;
   opacity: 0.85;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 4px 10px;
+  border-radius: 999px;
 }
 
-@keyframes scorePop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+#total {
+  font-family: "Bebas Neue", "Sora", sans-serif;
+  font-size: 40px;
+  letter-spacing: 2px;
 }
 
 /* =========================
    TARGET / CHASE INFO
 ========================= */
 .target {
-  margin-top: 4px;
-  font-size: 13px;
-  padding: 3px 10px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.15);
+  margin-top: 6px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(244, 211, 94, 0.2);
+  color: var(--gold);
   display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.thisOver {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  opacity: 0.9;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 /* =========================
@@ -278,16 +352,20 @@ body {
 ========================= */
 @media (max-width: 768px) {
   #scoreStrip {
-    height: 80px;
+    height: 90px;
     padding: 0 18px;
   }
 
   .teamName {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .scoreLine {
-    font-size: 18px;
+    font-size: 20px;
+  }
+
+  #total {
+    font-size: 32px;
   }
 }
 
@@ -304,37 +382,125 @@ body {
   align-items: center;
   justify-content: center;
 
-  font-size: 160px;             /* BIG number */
-  font-weight: 900;
-  letter-spacing: 6px;
-
-  color: #fff;
-  text-shadow:
-    0 8px 30px rgba(0,0,0,0.55),
-    0 0 40px rgba(255,255,255,0.25);
-
   opacity: 0;
   pointer-events: none;
   z-index: 80;
 }
 
-/* FOUR */
-#eventOverlay.four {
-  color: #ffd166;
+#eventOverlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.75));
+  opacity: 0;
+  transition: opacity 200ms ease;
 }
 
-/* SIX */
-#eventOverlay.six {
-  color: #ffb703;
+#eventOverlay.show::before {
+  opacity: 1;
 }
 
-/* WICKET */
-#eventOverlay.wicket {
-  font-size: 120px;
-  color: #ff4d4d;
+.eventHalo {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 80px rgba(255, 255, 255, 0.18);
+  opacity: 0;
 }
 
-/* Pop animation */
+.eventInner {
+  position: relative;
+  padding: 18px 64px 16px;
+  border-radius: 999px;
+  background: rgba(12, 20, 30, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.eventInner::after {
+  content: "";
+  position: absolute;
+  inset: -22px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  opacity: 0.9;
+}
+
+.eventText {
+  font-size: 170px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  font-family: "Bebas Neue", "Sora", sans-serif;
+  color: #fff;
+  text-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.6),
+    0 0 50px rgba(255, 255, 255, 0.25);
+  line-height: 0.9;
+}
+
+.eventLabel {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin-top: 6px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* FOUR / SIX / WICKET text colors */
+#eventOverlay.four .eventText {
+  color: var(--gold);
+}
+
+#eventOverlay.six .eventText {
+  color: var(--gold-deep);
+}
+
+#eventOverlay.wicket .eventText {
+  color: var(--danger);
+}
+
+/* Theme colors */
+#eventOverlay.four .eventInner {
+  background: radial-gradient(circle at top, rgba(244, 211, 94, 0.28), rgba(12, 20, 30, 0.85));
+  border-color: rgba(244, 211, 94, 0.45);
+}
+
+#eventOverlay.six .eventInner {
+  background: radial-gradient(circle at top, rgba(233, 185, 73, 0.3), rgba(12, 20, 30, 0.85));
+  border-color: rgba(233, 185, 73, 0.5);
+}
+
+#eventOverlay.wicket .eventInner {
+  background: radial-gradient(circle at top, rgba(255, 92, 92, 0.3), rgba(12, 20, 30, 0.85));
+  border-color: rgba(255, 92, 92, 0.55);
+}
+
+#eventOverlay.four .eventHalo {
+  border-color: rgba(244, 211, 94, 0.7);
+  box-shadow: 0 0 90px rgba(244, 211, 94, 0.6);
+}
+
+#eventOverlay.six .eventHalo {
+  border-color: rgba(233, 185, 73, 0.75);
+  box-shadow: 0 0 90px rgba(233, 185, 73, 0.65);
+}
+
+#eventOverlay.wicket .eventHalo {
+  border-color: rgba(255, 92, 92, 0.8);
+  box-shadow: 0 0 90px rgba(255, 92, 92, 0.7);
+}
+
+#eventOverlay.wicket .eventLabel {
+  color: rgba(255, 92, 92, 0.9);
+}
+
+/* Animations */
 @keyframes bigPop {
   0% {
     opacity: 0;
@@ -355,7 +521,21 @@ body {
 }
 
 #eventOverlay.show {
+  opacity: 1;
+}
+
+#eventOverlay.show .eventInner {
   animation: bigPop 2.4s ease-out forwards;
+}
+
+@keyframes haloPulse {
+  0% { opacity: 0; transform: scale(0.7); }
+  30% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+
+#eventOverlay.show .eventHalo {
+  animation: haloPulse 2.4s ease-out forwards;
 }
 
 /* =========================
@@ -386,4 +566,3 @@ body {
     opacity: 0;
   }
 }
-

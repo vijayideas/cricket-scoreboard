@@ -18,6 +18,8 @@ async function fetchScore() {
     document.getElementById("fieldingTeam").innerText = d.fieldingTeam || "";
     document.getElementById("match").innerText = d.match || "";
     document.getElementById("matchInfo").innerText = d.matchInfo || "";
+    document.getElementById("thisOver").innerText =
+      `This over: ${d.thisOver ? d.thisOver : "–"}`;
 
     const runs = Number(d.runs || 0);
     const wickets = Number(d.wickets || 0);
@@ -72,13 +74,23 @@ setInterval(fetchScore, 1000);
 
 function showEvent(text, type) {
   const el = document.getElementById("eventOverlay");
+  const textEl = document.getElementById("eventText");
+  const labelEl = document.getElementById("eventLabel");
+
+  const label =
+    type === "four" ? "FOUR" :
+    type === "six" ? "SIX" :
+    type === "wicket" ? "WICKET" : "";
+
   el.className = "";
-  el.innerText = text;
+  textEl.innerText = text;
+  labelEl.innerText = label;
   el.classList.add(type, "show");
 
   setTimeout(() => {
     el.className = "";
-    el.innerText = "";
+    textEl.innerText = "";
+    labelEl.innerText = "";
   }, 2400);
 }
 
@@ -96,5 +108,3 @@ function launchConfettiFull() {
     setTimeout(() => c.remove(), 1700);
   }
 }
-
-
