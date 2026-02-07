@@ -173,7 +173,7 @@ body {
   transform: translateX(-50%);
   width: calc(100% - 40px);
   max-width: 1700px;
-  height: 100px;
+  height: 130px;
   background: linear-gradient(135deg, rgba(9, 22, 35, 0.95), rgba(8, 55, 60, 0.95));
   border-radius: 18px;
   display: flex;
